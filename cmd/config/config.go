@@ -1,4 +1,4 @@
-package cmd
+package config
 
 import (
 	"io/ioutil"
@@ -16,7 +16,7 @@ type OwnerConfig struct {
 	Files []string `yaml:"files"`
 }
 
-func getConfig(cfgPath string) (*ApproveConfig, error) {
+func GetConfig(cfgPath string) (*ApproveConfig, error) {
 	buf, err := ioutil.ReadFile(cfgPath)
 	if err != nil {
 		return nil, err

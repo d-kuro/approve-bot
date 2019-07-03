@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/d-kuro/approve-bot/cmd/config"
 	"github.com/spf13/cobra"
 )
 
@@ -29,6 +30,10 @@ func Execute(outStream, errStream io.Writer) int {
 	addCommands(cmd, o)
 
 	if err := cmd.Execute(); err != nil {
+		if e, ok := err.(ValidateError); ok {
+			fmt.Fprintf(errStream, "validate error: %s (exit code: 0)\n", e.msg)
+			return exitCodeOK
+		}
 		fmt.Fprintf(errStream, "error: %s\n", err)
 		return exitCodeErr
 	}
@@ -53,12 +58,12 @@ func NewRootCommand(o *Option) *cobra.Command {
 			if err := getEnv(o); err != nil {
 				return err
 			}
-			cfg, err := getConfig(o.config)
+			cfg, err := config.GetConfig(o.config)
 			if err != nil {
 				return err
 			}
 			if err := Validate(cfg, o); err != nil {
-				return nil
+				return err
 			}
 			return run(cfg, o)
 		},
@@ -88,7 +93,7 @@ func getEnv(o *Option) error {
 		o.prURL = prURL
 	}
 	// https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
-	if prNum := os.Getenv("TRAVIS_PULL_REQUEST"); prNum != "false" {
+	if prNum := os.Getenv("TRAVIS_PULL_REQUEST"); prNum != "false" && prNum != "" {
 		i, err := strconv.Atoi(prNum)
 		if err != nil {
 			return err
@@ -99,7 +104,7 @@ func getEnv(o *Option) error {
 	return nil
 }
 
-func run(cfg *ApproveConfig, o *Option) error {
+func run(cfg *config.ApproveConfig, o *Option) error {
 	return nil
 }
 
