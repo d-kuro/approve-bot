@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/d-kuro/approve-bot/cmd/config"
+	"github.com/d-kuro/approve-bot/pkg/approve"
 	"github.com/spf13/cobra"
 )
 
@@ -30,12 +31,17 @@ func Execute(outStream, errStream io.Writer) int {
 	addCommands(cmd, o)
 
 	if err := cmd.Execute(); err != nil {
-		if e, ok := err.(ValidateError); ok {
-			fmt.Fprintf(errStream, "validate error: %s (exit code: 0)\n", e.msg)
+		switch e := err.(type) {
+		case ValidateError:
+			fmt.Fprintf(errStream, "validate error: %s (exit code: 0)\n", e.Error())
 			return exitCodeOK
+		case approve.UnmatcheOwnerErr:
+			fmt.Fprintf(errStream, "error: %s (exit code: 0)\n", e.Error())
+			return exitCodeOK
+		default:
+			fmt.Fprintf(errStream, "error: %s\n", err)
+			return exitCodeErr
 		}
-		fmt.Fprintf(errStream, "error: %s\n", err)
-		return exitCodeErr
 	}
 	return exitCodeOK
 }
@@ -85,11 +91,11 @@ func addCommands(rootCmd *cobra.Command, o *Option) {
 }
 
 func getEnv(o *Option) error {
-	if token := os.Getenv("GITHUB_TOKEN"); len(token) > 0 {
+	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
 		o.token = token
 	}
 	// https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
-	if prURL := os.Getenv("CIRCLE_PULL_REQUEST"); len(prURL) > 0 {
+	if prURL := os.Getenv("CIRCLE_PULL_REQUEST"); prURL != "" {
 		o.prURL = prURL
 	}
 	// https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
@@ -105,6 +111,15 @@ func getEnv(o *Option) error {
 }
 
 func run(cfg *config.ApproveConfig, o *Option) error {
+	if err := approve.Approve(o.token, o.prURL, o.prNum, cfg); err != nil {
+		return err
+	}
+
+	if o.prURL != "" {
+		fmt.Fprintf(o.outStream, "approved PR: %s", o.prURL)
+		return nil
+	}
+	fmt.Fprintf(o.outStream, "approved PR: https://%s/pull/%d", cfg.Repo, o.prNum)
 	return nil
 }
 
