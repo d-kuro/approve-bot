@@ -79,7 +79,7 @@ func NewRootCommand(o *Option) *cobra.Command {
 	fset.StringVar(&o.prURL, "pr", "", "Pull Request URL. Or environment variable (\"CIRCLE_PULL_REQUEST\")")
 	fset.IntVar(&o.prNum, "prnum", 0, "Pull Request Number. Or environment variable (\"TRAVIS_PULL_REQUEST\")")
 	fset.StringVar(&o.token, "token", "", "GitHub token. Or environment variable (\"GITHUB_TOKEN\")")
-	fset.StringVar(&o.config, "config", "", "Config YAML file path.")
+	fset.StringVar(&o.config, "config", "approve.yaml", "Config YAML file path.")
 
 	return cmd
 }
