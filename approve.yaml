@@ -4,7 +4,7 @@ owners:
     files:
       - /path/to/file1
       - /path/to/file2
-  - name: katainaka
+  - name: d-kuro-kuro
     files:
       - /path/to/file3
       - /path/to/file4
