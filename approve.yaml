@@ -1,0 +1,10 @@
+repo: github.com/d-kuro/approve-bot
+owners:
+  - name: d-kuro
+    files:
+      - /path/to/file1
+      - /path/to/file2
+  - name: katainaka
+    files:
+      - /path/to/file3
+      - /path/to/file4
