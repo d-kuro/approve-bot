@@ -1,6 +1,7 @@
 package approve
 
 import (
+	"bytes"
 	"context"
 	"testing"
 )
@@ -51,12 +52,13 @@ func Test_matchFiles(t *testing.T) {
 		},
 	}
 
-	o := Options{}
-	ctx := context.Background()
-
 	for _, tt := range cases {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			buf := &bytes.Buffer{}
+			o := Options{outStream: buf}
+			ctx := context.Background()
+
 			err := o.matchFiles(ctx, tt.prFiles, tt.ownerPatterns)
 			if err != nil && tt.success {
 				t.Errorf("error: %s", err)

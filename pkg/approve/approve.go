@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"io"
 	"regexp"
 	"strconv"
+	"strings"
 	"text/template"
 
 	"github.com/d-kuro/approve-bot/cmd/config"
@@ -21,6 +23,7 @@ var (
 type Options struct {
 	client *github.Client
 	*PR
+	outStream io.Writer
 }
 
 type PR struct {
@@ -93,7 +96,7 @@ func (o *Options) createPRReview(ctx context.Context, ownerFiles []string) error
 	}
 
 	event := "APPROVE"
-	comment := buf.String()
+	comment := strings.ReplaceAll(buf.String(), "#", "`")
 	review := &github.PullRequestReviewRequest{
 		Event: &event,
 		Body:  &comment,
@@ -143,4 +146,4 @@ func splitPR(prURL string, prNum int, repo string) (*PR, error) {
 const msgTemplate = `
 **[APPROVE]** Matched with owner's file:
 {{range .}}
-* {{.}}{{end}}`
+* #{{.}}#{{end}}`
