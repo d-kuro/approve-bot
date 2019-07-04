@@ -42,7 +42,7 @@ func (o *Options) listFiles(ctx context.Context, nextPage int) ([]string, int, e
 	return f, res.NextPage, nil
 }
 
-func (Options) matchFiles(ctx context.Context, prFiles []string, ownerPatterns []string) error {
+func (o *Options) matchFiles(ctx context.Context, prFiles []string, ownerPatterns []string) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
