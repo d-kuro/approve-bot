@@ -2,12 +2,19 @@ package approve
 
 import (
 	"context"
-	"errors"
 	"sync"
 
 	"github.com/d-kuro/approve-bot/cmd/config"
 	"github.com/google/go-github/v26/github"
 )
+
+type UnmatchedFilesErr struct {
+	msg string
+}
+
+func (e UnmatchedFilesErr) Error() string {
+	return e.msg
+}
 
 func (o *Options) getOwner(ctx context.Context) (string, error) {
 	pr, _, err := o.client.PullRequests.Get(ctx, o.owner, o.repo, o.number)
@@ -53,7 +60,7 @@ func (o *Options) matchFiles(ctx context.Context, prFiles []string, ownerFiles [
 					}
 				}
 				once.Do(func() {
-					errCh <- errors.New("unmatched file: " + prf)
+					errCh <- UnmatchedFilesErr{msg: "unmatched file: " + prf}
 					cancel()
 				})
 			}
@@ -77,7 +84,7 @@ func getOwnerFile(owner string, cfg *config.ApproveConfig) ([]string, error) {
 			return o.Files, nil
 		}
 	}
-	return nil, UnmatcheOwnerErr{msg: "unmatched owner"}
+	return nil, UnmatchedOwnerErr{msg: "unmatched owner"}
 }
 
 func isDone(ctx context.Context) bool {

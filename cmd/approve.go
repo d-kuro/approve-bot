@@ -35,7 +35,10 @@ func Execute(outStream, errStream io.Writer) int {
 		case ValidateError:
 			fmt.Fprintf(errStream, "validate error: %s (exit code: 0)\n", e.Error())
 			return exitCodeOK
-		case approve.UnmatcheOwnerErr:
+		case approve.UnmatchedOwnerErr:
+			fmt.Fprintf(errStream, "error: %s (exit code: 0)\n", e.Error())
+			return exitCodeOK
+		case approve.UnmatchedFilesErr:
 			fmt.Fprintf(errStream, "error: %s (exit code: 0)\n", e.Error())
 			return exitCodeOK
 		default:

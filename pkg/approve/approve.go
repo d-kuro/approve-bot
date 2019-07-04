@@ -28,11 +28,11 @@ type PR struct {
 	number int
 }
 
-type UnmatcheOwnerErr struct {
+type UnmatchedOwnerErr struct {
 	msg string
 }
 
-func (e UnmatcheOwnerErr) Error() string {
+func (e UnmatchedOwnerErr) Error() string {
 	return e.msg
 }
 
