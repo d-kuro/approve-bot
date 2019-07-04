@@ -2,6 +2,7 @@ package approve
 
 import (
 	"context"
+	"regexp"
 	"sync"
 
 	"github.com/d-kuro/approve-bot/cmd/config"
@@ -41,7 +42,7 @@ func (o *Options) listFiles(ctx context.Context, nextPage int) ([]string, int, e
 	return f, res.NextPage, nil
 }
 
-func (o *Options) matchFiles(ctx context.Context, prFiles []string, ownerFiles []string) error {
+func (Options) matchFiles(ctx context.Context, prFiles []string, ownerFiles []string) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -49,13 +50,19 @@ func (o *Options) matchFiles(ctx context.Context, prFiles []string, ownerFiles [
 	wg := &sync.WaitGroup{}
 	once := sync.Once{}
 
+	regexpMap, err := compileOwnerFile(ownerFiles)
+	if err != nil {
+		return err
+	}
+
 	for _, prf := range prFiles {
 		wg.Add(1)
 		go func(prf string) {
 			defer wg.Done()
 			if !isDone(ctx) {
 				for _, f := range ownerFiles {
-					if prf == f {
+					r := regexpMap[f]
+					if r.MatchString(prf) {
 						return
 					}
 				}
@@ -85,6 +92,18 @@ func getOwnerFile(owner string, cfg *config.ApproveConfig) ([]string, error) {
 		}
 	}
 	return nil, UnmatchedOwnerErr{msg: "unmatched owner"}
+}
+
+func compileOwnerFile(ownerFiles []string) (map[string]*regexp.Regexp, error) {
+	compiles := make(map[string]*regexp.Regexp, len(ownerFiles))
+	for _, f := range ownerFiles {
+		r, err := regexp.Compile(f)
+		if err != nil {
+			return nil, err
+		}
+		compiles[f] = r
+	}
+	return compiles, nil
 }
 
 func isDone(ctx context.Context) bool {
