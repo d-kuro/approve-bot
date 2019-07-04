@@ -1,5 +1,5 @@
 .PHONY: build generate clean test
-BINARY_NAME  = restart-object
+BINARY_NAME  = approve-bot
 LDFLAGS      = -ldflags="-s -w -X \"github.com/d-kuro/approve-bot/cmd.Revision=$(shell git rev-parse --short HEAD)\""
 
 export GO111MODULE=on

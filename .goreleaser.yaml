@@ -1,6 +1,6 @@
 builds:
   - main: main.go
-    binary: restart-object
+    binary: approve-bot
     goos:
       - windows
       - darwin
