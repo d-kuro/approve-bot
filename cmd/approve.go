@@ -135,8 +135,8 @@ approve.yaml:
 owners:
   - name: d-kuro
     files:
-      - /path/to/file1
-      - /path/to/file2
+      - path/to/file
+      - cmd/approve.go
 ---
 
 # Or specify a Pull Request number. "repo" of config is required, when using Pull Request number.
@@ -148,7 +148,7 @@ repo: github.com/d-kuro/approve-bot
 owners:
   - name: d-kuro
     files:
-      - /path/to/file1
-      - /path/to/file2
+      - path/to/file
+      - cmd/approve.go
 ---
 `
