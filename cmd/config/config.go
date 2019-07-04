@@ -12,8 +12,8 @@ type ApproveConfig struct {
 }
 
 type OwnerConfig struct {
-	Name  string   `yaml:"name"`
-	Files []string `yaml:"files"`
+	Name     string   `yaml:"name"`
+	Patterns []string `yaml:"patterns"`
 }
 
 func GetConfig(cfgPath string) (*ApproveConfig, error) {

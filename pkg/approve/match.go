@@ -42,7 +42,7 @@ func (o *Options) listFiles(ctx context.Context, nextPage int) ([]string, int, e
 	return f, res.NextPage, nil
 }
 
-func (Options) matchFiles(ctx context.Context, prFiles []string, ownerFiles []string) error {
+func (Options) matchFiles(ctx context.Context, prFiles []string, ownerPatterns []string) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -50,7 +50,7 @@ func (Options) matchFiles(ctx context.Context, prFiles []string, ownerFiles []st
 	wg := &sync.WaitGroup{}
 	once := sync.Once{}
 
-	regexpMap, err := compileOwnerFile(ownerFiles)
+	regexpMap, err := compileOwnerPatterns(ownerPatterns)
 	if err != nil {
 		return err
 	}
@@ -60,8 +60,8 @@ func (Options) matchFiles(ctx context.Context, prFiles []string, ownerFiles []st
 		go func(prf string) {
 			defer wg.Done()
 			if !isDone(ctx) {
-				for _, f := range ownerFiles {
-					r := regexpMap[f]
+				for _, p := range ownerPatterns {
+					r := regexpMap[p]
 					if r.MatchString(prf) {
 						return
 					}
@@ -85,16 +85,16 @@ func (Options) matchFiles(ctx context.Context, prFiles []string, ownerFiles []st
 	return nil
 }
 
-func getOwnerFile(owner string, cfg *config.ApproveConfig) ([]string, error) {
+func getOwnerPatterns(owner string, cfg *config.ApproveConfig) ([]string, error) {
 	for _, o := range cfg.Owners {
 		if o.Name == owner {
-			return o.Files, nil
+			return o.Patterns, nil
 		}
 	}
 	return nil, UnmatchedOwnerErr{msg: "unmatched owner"}
 }
 
-func compileOwnerFile(ownerFiles []string) (map[string]*regexp.Regexp, error) {
+func compileOwnerPatterns(ownerFiles []string) (map[string]*regexp.Regexp, error) {
 	compiles := make(map[string]*regexp.Regexp, len(ownerFiles))
 	for _, f := range ownerFiles {
 		r, err := regexp.Compile(f)

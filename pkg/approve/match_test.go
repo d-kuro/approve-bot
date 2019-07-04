@@ -11,43 +11,43 @@ var (
 		"cmd/version.go",
 		"cmd/validate.go",
 	}
-	ownerMatchFiles = []string{
+	ownerMatchPatterns = []string{
 		"cmd/approve.go",
 		"cmd/version.go",
 		"cmd/validate.go",
 	}
-	ownerUnmatchedFiles = []string{
+	ownerUnmatchedPatterns = []string{
 		"cmd/foo.go",
 	}
-	ownerUnmatchedRegexpFiles = []string{
+	ownerUnmatchedRegexpPatterns = []string{
 		"cmd/[A-Z]+",
 	}
 )
 
 func Test_matchFiles(t *testing.T) {
 	cases := []struct {
-		name       string
-		prFiles    []string
-		ownerFiles []string
-		success    bool
+		name          string
+		prFiles       []string
+		ownerPatterns []string
+		success       bool
 	}{
 		{
-			name:       "match files",
-			prFiles:    prFiles,
-			ownerFiles: ownerMatchFiles,
-			success:    true,
+			name:          "match files",
+			prFiles:       prFiles,
+			ownerPatterns: ownerMatchPatterns,
+			success:       true,
 		},
 		{
-			name:       "unmatched files",
-			prFiles:    prFiles,
-			ownerFiles: ownerUnmatchedFiles,
-			success:    false,
+			name:          "unmatched files",
+			prFiles:       prFiles,
+			ownerPatterns: ownerUnmatchedPatterns,
+			success:       false,
 		},
 		{
-			name:       "unmatched regexp files",
-			prFiles:    prFiles,
-			ownerFiles: ownerUnmatchedRegexpFiles,
-			success:    false,
+			name:          "unmatched regexp files",
+			prFiles:       prFiles,
+			ownerPatterns: ownerUnmatchedRegexpPatterns,
+			success:       false,
 		},
 	}
 
@@ -57,7 +57,7 @@ func Test_matchFiles(t *testing.T) {
 	for _, tt := range cases {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			err := o.matchFiles(ctx, tt.prFiles, tt.ownerFiles)
+			err := o.matchFiles(ctx, tt.prFiles, tt.ownerPatterns)
 			if err != nil && tt.success {
 				t.Errorf("error: %s", err)
 			} else if err == nil && !tt.success {

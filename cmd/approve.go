@@ -134,9 +134,11 @@ approve.yaml:
 ---
 owners:
   - name: d-kuro
-    files:
+    patterns:
       - path/to/file
+      - regexp
       - cmd/approve.go
+      - cmd/[a-z]+.go
 ---
 
 # Or specify a Pull Request number. "repo" of config is required, when using Pull Request number.
@@ -147,8 +149,10 @@ approve.yaml:
 repo: github.com/d-kuro/approve-bot
 owners:
   - name: d-kuro
-    files:
+    patterns:
       - path/to/file
+      - regexp
       - cmd/approve.go
+      - cmd/[a-z]+.go
 ---
 `
