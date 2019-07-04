@@ -1,11 +1,12 @@
 package approve
 
 import (
+	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"regexp"
 	"strconv"
+	"text/template"
 
 	"github.com/d-kuro/approve-bot/cmd/config"
 	"github.com/google/go-github/v26/github"
@@ -82,14 +83,22 @@ func Approve(token, prURL string, prNum int, cfg *config.ApproveConfig) error {
 }
 
 func (o *Options) createPRReview(ctx context.Context, ownerFiles []string) error {
+	tmpl, err := template.New("template").Parse(msgTemplate)
+	if err != nil {
+		return err
+	}
+	buf := &bytes.Buffer{}
+	if err := tmpl.Execute(buf, ownerFiles); err != nil {
+		return err
+	}
+
 	event := "APPROVE"
-	comment := fmt.Sprintf("[APPROVE] Matched with owner's file: %s", ownerFiles)
+	comment := buf.String()
 	review := &github.PullRequestReviewRequest{
 		Event: &event,
 		Body:  &comment,
 	}
-	_, _, err := o.client.PullRequests.CreateReview(ctx, o.owner, o.repo, o.number, review)
-	if err != nil {
+	if _, _, err := o.client.PullRequests.CreateReview(ctx, o.owner, o.repo, o.number, review); err != nil {
 		return err
 	}
 	return nil
@@ -130,3 +139,8 @@ func splitPR(prURL string, prNum int, repo string) (*PR, error) {
 		number: prNum,
 	}, nil
 }
+
+const msgTemplate = `
+**[APPROVE]** Matched with owner's file:
+{{range .}}
+* {{.}}{{end}}`
