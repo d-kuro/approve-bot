@@ -1,10 +1,14 @@
 repo: github.com/d-kuro/approve-bot
 owners:
   - name: d-kuro
-    files:
+    patterns:
       - path/to/file
+      - regexp
       - cmd/approve.go
+      - cmd/[a-z]+.go
   - name: d-kuro-kuro
-    files:
+    patterns:
       - path/to/file
+      - regexp
       - cmd/version.go
+      - cmd/.+

@@ -54,7 +54,7 @@ func Approve(token, prURL string, prNum int, cfg *config.ApproveConfig) error {
 	if err != nil {
 		return err
 	}
-	ownerFiles, err := getOwnerFile(owner, cfg)
+	ownerFiles, err := getOwnerPatterns(owner, cfg)
 	if err != nil {
 		return err
 	}
