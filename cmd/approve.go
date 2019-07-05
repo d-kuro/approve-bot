@@ -1,13 +1,13 @@
 package cmd
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"strconv"
 
 	"github.com/d-kuro/approve-bot/cmd/config"
 	"github.com/d-kuro/approve-bot/pkg/approve"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -31,18 +31,19 @@ func Execute(outStream, errStream io.Writer) int {
 	addCommands(cmd, o)
 
 	if err := cmd.Execute(); err != nil {
+		red := color.New(color.FgRed)
 		switch e := err.(type) {
 		case ValidateError:
-			fmt.Fprintf(errStream, "validate error: %s (exit code: 0)\n", e.Error())
+			red.Fprintf(errStream, "validate error: %s (exit code: 0)\n", e.Error())
 			return exitCodeOK
 		case approve.UnmatchedOwnerErr:
-			fmt.Fprintf(errStream, "error: %s (exit code: 0)\n", e.Error())
+			red.Fprintf(errStream, "error: %s (exit code: 0)\n", e.Error())
 			return exitCodeOK
 		case approve.UnmatchedFilesErr:
-			fmt.Fprintf(errStream, "error: %s (exit code: 0)\n", e.Error())
+			red.Fprintf(errStream, "error: %s (exit code: 0)\n", e.Error())
 			return exitCodeOK
 		default:
-			fmt.Fprintf(errStream, "error: %s\n", err)
+			red.Fprintf(errStream, "error: %s\n", err)
 			return exitCodeErr
 		}
 	}
@@ -114,15 +115,16 @@ func getEnv(o *Option) error {
 }
 
 func run(cfg *config.ApproveConfig, o *Option) error {
-	if err := approve.Approve(o.token, o.prURL, o.prNum, cfg); err != nil {
+	if err := approve.Approve(o.token, o.prURL, o.prNum, cfg, o.outStream); err != nil {
 		return err
 	}
 
+	green := color.New(color.FgGreen)
 	if o.prURL != "" {
-		fmt.Fprintf(o.outStream, "approved PR: %s", o.prURL)
+		green.Fprintf(o.outStream, "Approved PR: %s\n", o.prURL)
 		return nil
 	}
-	fmt.Fprintf(o.outStream, "approved PR: https://%s/pull/%d", cfg.Repo, o.prNum)
+	green.Fprintf(o.outStream, "Approved PR: https://%s/pull/%d\n", cfg.Repo, o.prNum)
 	return nil
 }
 

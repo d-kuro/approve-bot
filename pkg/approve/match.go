@@ -2,6 +2,7 @@ package approve
 
 import (
 	"context"
+	"fmt"
 	"regexp"
 	"sync"
 
@@ -17,12 +18,12 @@ func (e UnmatchedFilesErr) Error() string {
 	return e.msg
 }
 
-func (o *Options) getOwner(ctx context.Context) (string, error) {
+func (o *Options) getOwner(ctx context.Context) (string, string, error) {
 	pr, _, err := o.client.PullRequests.Get(ctx, o.owner, o.repo, o.number)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	return *pr.User.Login, nil
+	return *pr.User.Login, *pr.User.HTMLURL, nil
 }
 
 func (o *Options) listFiles(ctx context.Context, nextPage int) ([]string, int, error) {
@@ -91,7 +92,7 @@ func getOwnerPatterns(owner string, cfg *config.ApproveConfig) ([]string, error)
 			return o.Patterns, nil
 		}
 	}
-	return nil, UnmatchedOwnerErr{msg: "unmatched owner"}
+	return nil, UnmatchedOwnerErr{msg: fmt.Sprintf("unmatched owner: %s", owner)}
 }
 
 func compileOwnerPatterns(ownerFiles []string) (map[string]*regexp.Regexp, error) {
