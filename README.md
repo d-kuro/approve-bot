@@ -7,7 +7,7 @@
 The approve-bot defines an owner and a regular expression pattern and approves Pull Requests based on it.
 approve-bot config is defined in YAML. By default, it is read from the file `.approve.yaml`.
 
-Sample config `.approve.yaml`:
+Example config `.approve.yaml`:
 
 ```yaml
 repo: github.com/d-kuro/approve-bot
