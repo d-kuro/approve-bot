@@ -129,10 +129,9 @@ func run(cfg *config.ApproveConfig, o *Option) error {
 }
 
 const example = `
-$ approve-bot --config approve.yaml --token <your GitHub token for repo scope> \
-  --pr https://github.com/d-kuro/approve-bot/pull/1
+$ approve-bot --token <your GitHub token for repo scope> --pr https://github.com/d-kuro/approve-bot/pull/1
 
-approve.yaml:
+.approve.yaml:
 ---
 owners:
   - name: d-kuro
@@ -144,9 +143,9 @@ owners:
 ---
 
 # Or specify a Pull Request number. "repo" of config is required, when using Pull Request number.
-$ approve-bot --config approve.yaml --token <your GitHub token for repo scope > --prnum 1
+$ approve-bot --token <your GitHub token for repo scope > --prnum 1
 
-approve.yaml:
+.approve.yaml:
 ---
 repo: github.com/d-kuro/approve-bot
 owners:
