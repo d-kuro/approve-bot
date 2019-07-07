@@ -95,15 +95,15 @@ func addCommands(rootCmd *cobra.Command, o *Option) {
 }
 
 func getEnv(o *Option) error {
-	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+	if token := os.Getenv("GITHUB_TOKEN"); token != "" && o.token == "" {
 		o.token = token
 	}
 	// https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
-	if prURL := os.Getenv("CIRCLE_PULL_REQUEST"); prURL != "" {
+	if prURL := os.Getenv("CIRCLE_PULL_REQUEST"); prURL != "" && o.prURL == "" {
 		o.prURL = prURL
 	}
 	// https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
-	if prNum := os.Getenv("TRAVIS_PULL_REQUEST"); prNum != "false" && prNum != "" {
+	if prNum := os.Getenv("TRAVIS_PULL_REQUEST"); prNum != "false" && prNum != "" && o.prNum == 0 {
 		i, err := strconv.Atoi(prNum)
 		if err != nil {
 			return err
