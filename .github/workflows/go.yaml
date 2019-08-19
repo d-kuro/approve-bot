@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         go:
-        - 1.12.7
+        - 1.12.9
     name: Go ${{ matrix.go }} build
     steps:
     - uses: actions/checkout@master
