@@ -68,7 +68,7 @@ func NewRootCommand(o *Option) *cobra.Command {
 			if err := getEnv(o); err != nil {
 				return err
 			}
-			cfg, err := config.GetConfig(o.config)
+			cfg, err := config.LoadConfigFromFile(o.config)
 			if err != nil {
 				return err
 			}
