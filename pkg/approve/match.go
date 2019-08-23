@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/d-kuro/approve-bot/cmd/config"
-	"github.com/google/go-github/v26/github"
 )
 
 type UnmatchedFilesErr struct {
@@ -18,32 +17,15 @@ func (e UnmatchedFilesErr) Error() string {
 	return e.msg
 }
 
-func (o *Options) getOwner(ctx context.Context) (string, string, error) {
-	pr, _, err := o.client.PullRequests.Get(ctx, o.owner, o.repo, o.number)
-	if err != nil {
-		return "", "", err
-	}
-	return *pr.User.Login, *pr.User.HTMLURL, nil
+type UnmatchedOwnerErr struct {
+	msg string
 }
 
-func (o *Options) listFiles(ctx context.Context, nextPage int) ([]string, int, error) {
-	listOps := &github.ListOptions{
-		PerPage: 100,
-		Page:    nextPage,
-	}
-	files, res, err := o.client.PullRequests.ListFiles(ctx, o.owner, o.repo, o.number, listOps)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	f := make([]string, 0, len(files))
-	for _, v := range files {
-		f = append(f, *v.Filename)
-	}
-	return f, res.NextPage, nil
+func (e UnmatchedOwnerErr) Error() string {
+	return e.msg
 }
 
-func (o *Options) matchFiles(ctx context.Context, prFiles []string, ownerPatterns []string) error {
+func matchFiles(ctx context.Context, prFiles []string, ownerPatterns []string) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -86,8 +68,8 @@ func (o *Options) matchFiles(ctx context.Context, prFiles []string, ownerPattern
 	return nil
 }
 
-func getOwnerPatterns(owner string, cfg *config.ApproveConfig) ([]string, error) {
-	for _, o := range cfg.Owners {
+func getOwnerPatterns(owner string, config *config.ApproveConfig) ([]string, error) {
+	for _, o := range config.Owners {
 		if o.Name == owner {
 			return o.Patterns, nil
 		}

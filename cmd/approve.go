@@ -114,8 +114,9 @@ func getEnv(o *Option) error {
 	return nil
 }
 
-func run(cfg *config.ApproveConfig, o *Option) error {
-	if err := approve.Approve(o.Token, o.PRURL, o.PRNum, cfg, o.outStream); err != nil {
+func run(config *config.ApproveConfig, o *Option) error {
+	option := approve.NewOption(o.PRURL, o.PRNum, o.Token)
+	if err := approve.Approve(option, config); err != nil {
 		return err
 	}
 
@@ -124,7 +125,7 @@ func run(cfg *config.ApproveConfig, o *Option) error {
 		green.Fprintf(o.outStream, "Approved PR: %s\n", o.PRURL)
 		return nil
 	}
-	green.Fprintf(o.outStream, "Approved PR: https://%s/pull/%d\n", cfg.Repo, o.PRNum)
+	green.Fprintf(o.outStream, "Approved PR: https://%s/pull/%d\n", config.Repo, o.PRNum)
 	return nil
 }
 
