@@ -41,8 +41,7 @@ func TestValidate(t *testing.T) {
 			if err == nil {
 				t.Fatalf("expect an error")
 			}
-			switch e := err.(type) {
-			case cmd.ValidateError:
+			if e, ok := err.(cmd.ValidateError); ok {
 				if e.Error() != tt.msg {
 					t.Errorf("got: %v, want: %v", tt.msg, e.Error())
 				}
