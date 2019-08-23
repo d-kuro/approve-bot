@@ -28,7 +28,7 @@ func listFiles(ctx context.Context, client *github.Client, pr *PR, nextPage int)
 		PerPage: 100,
 		Page:    nextPage,
 	}
-	files, res, err := client.PullRequests.ListFiles(ctx, pr.owner, pr.repo, pr.number, listOps)
+	files, res, err := client.PullRequests.ListFiles(ctx, pr.Owner, pr.Repo, pr.Number, listOps)
 	if err != nil {
 		return nil, 0, err
 	}

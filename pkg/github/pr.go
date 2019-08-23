@@ -8,13 +8,13 @@ import (
 
 var (
 	regURL  = regexp.MustCompile(`https://github.com/(.*)/(.*)/pull/(\d*)`)
-	regRepo = regexp.MustCompile("https://github.com/(.*)/(.*)")
+	regRepo = regexp.MustCompile("github.com/(.*)/(.*)")
 )
 
 type PR struct {
-	owner  string
-	repo   string
-	number int
+	Owner  string
+	Repo   string
+	Number int
 }
 
 func SplitPR(prURL string, prNum int, repo string) (*PR, error) {
@@ -29,19 +29,19 @@ func SplitPR(prURL string, prNum int, repo string) (*PR, error) {
 			return nil, err
 		}
 		return &PR{
-			owner:  string(group[1]),
-			repo:   string(group[2]),
-			number: num,
+			Owner:  string(group[1]),
+			Repo:   string(group[2]),
+			Number: num,
 		}, nil
 	}
 	bs := []byte(repo)
 	group := regRepo.FindSubmatch(bs)
 	if len(group) != 3 {
-		return nil, errors.New("")
+		return nil, errors.New("invalid PR format")
 	}
 	return &PR{
-		owner:  string(group[1]),
-		repo:   string(group[2]),
-		number: prNum,
+		Owner:  string(group[1]),
+		Repo:   string(group[2]),
+		Number: prNum,
 	}, nil
 }

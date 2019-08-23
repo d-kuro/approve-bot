@@ -38,7 +38,7 @@ const (
 	commentTemplate = `
 **[APPROVE]** Matched with Owner's Patterns
 
-owner: [{{ .Owner }}]({{ .OwnerURL }})
+Owner: [{{ .Owner }}]({{ .OwnerURL }})
 
 PR Files:
 {{range .PRFiles }}
