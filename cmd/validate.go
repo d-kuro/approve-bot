@@ -23,15 +23,15 @@ func Validate(c *config.ApproveConfig, o *Option) error {
 }
 
 func validatePR(c *config.ApproveConfig, o *Option) error {
-	if o.prURL == "" || c.Repo == "" && o.prNum == 0 {
+	if o.PRURL == "" || c.Repo == "" && o.PRNum == 0 {
 		return ValidateError{msg: "PR URL or repo URL and the PR number is required"}
 	}
 	return nil
 }
 
 func validateToken(o *Option) error {
-	if o.token == "" {
-		return ValidateError{msg: "token is required"}
+	if o.Token == "" {
+		return ValidateError{msg: "Token is required"}
 	}
 	return nil
 }
