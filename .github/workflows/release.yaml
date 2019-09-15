@@ -11,17 +11,17 @@ jobs:
     strategy:
       matrix:
         go:
-        - 1.12.9
+          - 1.12.9
     name: GoReleaser
     steps:
-    - uses: actions/checkout@master
-    - name: Setup Go
-      uses: actions/setup-go@v1
-      with:
-        version: ${{ matrix.go }}
-    - name: Run go mod download
-      run: go mod download
-    - name: Run GoReleaser
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: curl -sL https://git.io/goreleaser | bash
+      - uses: actions/checkout@master
+      - name: Setup Go
+        uses: actions/setup-go@v1
+        with:
+          version: ${{ matrix.go }}
+      - name: Run go mod download
+        run: go mod download
+      - name: Run GoReleaser
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: curl -sL https://git.io/goreleaser | bash
