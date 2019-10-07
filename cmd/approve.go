@@ -17,15 +17,15 @@ const (
 )
 
 type Option struct {
-	prURL     string
-	prNum     int
-	token     string
-	config    string
+	PRURL     string
+	PRNum     int
+	Token     string
+	Config    string
 	outStream io.Writer
 	errStream io.Writer
 }
 
-func Execute(outStream, errStream io.Writer) int {
+func ExecuteCmd(outStream, errStream io.Writer) int {
 	o := NewOption(outStream, errStream)
 	cmd := NewRootCommand(o)
 	addCommands(cmd, o)
@@ -68,7 +68,7 @@ func NewRootCommand(o *Option) *cobra.Command {
 			if err := getEnv(o); err != nil {
 				return err
 			}
-			cfg, err := config.GetConfig(o.config)
+			cfg, err := config.LoadConfigFromFile(o.Config)
 			if err != nil {
 				return err
 			}
@@ -80,10 +80,10 @@ func NewRootCommand(o *Option) *cobra.Command {
 	}
 
 	fset := cmd.Flags()
-	fset.StringVar(&o.prURL, "pr", "", "Pull Request URL. Or environment variable (\"CIRCLE_PULL_REQUEST\")")
-	fset.IntVar(&o.prNum, "prnum", 0, "Pull Request Number. Or environment variable (\"TRAVIS_PULL_REQUEST\")")
-	fset.StringVar(&o.token, "token", "", "GitHub token. Or environment variable (\"GITHUB_TOKEN\")")
-	fset.StringVar(&o.config, "config", ".approve.yaml", "Config YAML file path.")
+	fset.StringVar(&o.PRURL, "pr", "", "Pull Request URL. Or environment variable (\"CIRCLE_PULL_REQUEST\")")
+	fset.IntVar(&o.PRNum, "prnum", 0, "Pull Request Number. Or environment variable (\"TRAVIS_PULL_REQUEST\")")
+	fset.StringVar(&o.Token, "Token", "", "GitHub Token. Or environment variable (\"GITHUB_TOKEN\")")
+	fset.StringVar(&o.Config, "Config", ".approve.yaml", "Config YAML file path.")
 
 	return cmd
 }
@@ -95,41 +95,42 @@ func addCommands(rootCmd *cobra.Command, o *Option) {
 }
 
 func getEnv(o *Option) error {
-	if token := os.Getenv("GITHUB_TOKEN"); token != "" && o.token == "" {
-		o.token = token
+	if token := os.Getenv("GITHUB_TOKEN"); token != "" && o.Token == "" {
+		o.Token = token
 	}
 	// https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
-	if prURL := os.Getenv("CIRCLE_PULL_REQUEST"); prURL != "" && o.prURL == "" {
-		o.prURL = prURL
+	if prURL := os.Getenv("CIRCLE_PULL_REQUEST"); prURL != "" && o.PRURL == "" {
+		o.PRURL = prURL
 	}
 	// https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
-	if prNum := os.Getenv("TRAVIS_PULL_REQUEST"); prNum != "false" && prNum != "" && o.prNum == 0 {
+	if prNum := os.Getenv("TRAVIS_PULL_REQUEST"); prNum != "false" && prNum != "" && o.PRNum == 0 {
 		i, err := strconv.Atoi(prNum)
 		if err != nil {
 			return err
 		}
-		o.prNum = i
+		o.PRNum = i
 	}
 
 	return nil
 }
 
-func run(cfg *config.ApproveConfig, o *Option) error {
-	if err := approve.Approve(o.token, o.prURL, o.prNum, cfg, o.outStream); err != nil {
+func run(config *config.ApproveConfig, o *Option) error {
+	option := approve.NewOption(o.PRURL, o.PRNum, o.Token)
+	if err := approve.Approve(option, config); err != nil {
 		return err
 	}
 
 	green := color.New(color.FgGreen)
-	if o.prURL != "" {
-		green.Fprintf(o.outStream, "Approved PR: %s\n", o.prURL)
+	if o.PRURL != "" {
+		green.Fprintf(o.outStream, "Approved PR: %s\n", o.PRURL)
 		return nil
 	}
-	green.Fprintf(o.outStream, "Approved PR: https://%s/pull/%d\n", cfg.Repo, o.prNum)
+	green.Fprintf(o.outStream, "Approved PR: https://%s/pull/%d\n", config.Repo, o.PRNum)
 	return nil
 }
 
 const example = `
-$ approve-bot --token <your GitHub token for repo scope> --pr https://github.com/d-kuro/approve-bot/pull/1
+$ approve-bot --Token <your GitHub Token for repo scope> --pr https://github.com/d-kuro/approve-bot/pull/1
 
 .approve.yaml:
 ---
@@ -142,8 +143,8 @@ owners:
       - cmd/[a-z]+.go
 ---
 
-# Or specify a Pull Request number. "repo" of config is required, when using Pull Request number.
-$ approve-bot --token <your GitHub token for repo scope > --prnum 1
+# Or specify a Pull Request number. "repo" of Config is required, when using Pull Request number.
+$ approve-bot --Token <your GitHub Token for repo scope > --prnum 1
 
 .approve.yaml:
 ---

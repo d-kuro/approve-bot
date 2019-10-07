@@ -1,7 +1,9 @@
 package config
 
 import (
+	"io"
 	"io/ioutil"
+	"os"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -16,14 +18,22 @@ type OwnerConfig struct {
 	Patterns []string `yaml:"patterns"`
 }
 
-func GetConfig(cfgPath string) (*ApproveConfig, error) {
-	buf, err := ioutil.ReadFile(cfgPath)
+func LoadConfigFromFile(file string) (*ApproveConfig, error) {
+	f, err := os.OpenFile(file, os.O_RDONLY, 0)
 	if err != nil {
 		return nil, err
 	}
-	var cfg ApproveConfig
-	err = yaml.Unmarshal(buf, &cfg)
+	return LoadConfig(f)
+}
+
+func LoadConfig(r io.Reader) (*ApproveConfig, error) {
+	b, err := ioutil.ReadAll(r)
 	if err != nil {
+		return nil, err
+	}
+
+	var cfg ApproveConfig
+	if err := yaml.Unmarshal(b, &cfg); err != nil {
 		return nil, err
 	}
 	return &cfg, nil
