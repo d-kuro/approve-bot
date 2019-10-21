@@ -32,6 +32,7 @@ func ExecuteCmd(outStream, errStream io.Writer) int {
 
 	if err := cmd.Execute(); err != nil {
 		red := color.New(color.FgRed)
+
 		switch e := err.(type) {
 		case ValidateError:
 			red.Fprintf(errStream, "validate error: %s (exit code: 0)\n", e.Error())
@@ -47,6 +48,7 @@ func ExecuteCmd(outStream, errStream io.Writer) int {
 			return exitCodeErr
 		}
 	}
+
 	return exitCodeOK
 }
 
@@ -68,13 +70,16 @@ func NewRootCommand(o *Option) *cobra.Command {
 			if err := getEnv(o); err != nil {
 				return err
 			}
+
 			cfg, err := config.LoadConfigFromFile(o.Config)
 			if err != nil {
 				return err
 			}
+
 			if err := Validate(cfg, o); err != nil {
 				return err
 			}
+
 			return run(cfg, o)
 		},
 	}
@@ -108,6 +113,7 @@ func getEnv(o *Option) error {
 		if err != nil {
 			return err
 		}
+
 		o.PRNum = i
 	}
 
@@ -121,11 +127,15 @@ func run(config *config.ApproveConfig, o *Option) error {
 	}
 
 	green := color.New(color.FgGreen)
+
 	if o.PRURL != "" {
 		green.Fprintf(o.outStream, "Approved PR: %s\n", o.PRURL)
+
 		return nil
 	}
+
 	green.Fprintf(o.outStream, "Approved PR: https://%s/pull/%d\n", config.Repo, o.PRNum)
+
 	return nil
 }
 
