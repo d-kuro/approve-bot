@@ -40,10 +40,12 @@ func TestLoadConfigFromFile(t *testing.T) {
 
 	f := createTempFile(t)
 	defer removeTempFile(t, f)
+
 	got, err := config.LoadConfigFromFile(f)
 	if err != nil {
 		t.Fatalf("error: %v", err)
 	}
+
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got: %#v, want: %#v", got, want)
 	}
@@ -51,19 +53,24 @@ func TestLoadConfigFromFile(t *testing.T) {
 
 func createTempFile(t *testing.T) string {
 	t.Helper()
+
 	f, err := ioutil.TempFile("", "config")
 	if err != nil {
 		t.Fatalf("create temp file error: %v", err)
 	}
+
 	defer f.Close()
+
 	if _, err := fmt.Fprint(f, yaml); err != nil {
 		t.Fatalf("write to temp file error: %v", err)
 	}
+
 	return f.Name()
 }
 
 func removeTempFile(t *testing.T, file string) {
 	t.Helper()
+
 	if err := os.RemoveAll(file); err != nil {
 		t.Fatalf("remove temp file error: %v", err)
 	}
