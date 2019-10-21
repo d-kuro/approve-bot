@@ -35,6 +35,7 @@ func TestSplitPR(t *testing.T) {
 			if err != nil {
 				t.Fatalf("error: %v", err)
 			}
+
 			if !reflect.DeepEqual(pr, tt.pr) {
 				t.Errorf("got: %#v, want: %#v", pr, tt.pr)
 			}

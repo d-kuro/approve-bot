@@ -23,6 +23,7 @@ func LoadConfigFromFile(file string) (*ApproveConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return LoadConfig(f)
 }
 
@@ -36,5 +37,6 @@ func LoadConfig(r io.Reader) (*ApproveConfig, error) {
 	if err := yaml.Unmarshal(b, &cfg); err != nil {
 		return nil, err
 	}
+
 	return &cfg, nil
 }

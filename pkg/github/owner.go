@@ -7,5 +7,6 @@ func (c *Client) GetPROwner(ctx context.Context, pr *PR) (string, string, error)
 	if err != nil {
 		return "", "", err
 	}
+
 	return *prInfo.User.Login, *prInfo.User.HTMLURL, nil
 }

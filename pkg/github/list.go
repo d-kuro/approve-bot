@@ -8,18 +8,22 @@ import (
 
 func (c *Client) ListPRFiles(ctx context.Context, pr *PR) ([]string, error) {
 	prFiles := make([]string, 0)
-	var next = 1
+	next := 1
+
 	for {
 		if next == 0 {
 			break
 		}
+
 		f, i, err := listFiles(ctx, c.client, pr, next)
 		if err != nil {
 			return nil, err
 		}
+
 		prFiles = append(prFiles, f...)
 		next = i
 	}
+
 	return prFiles, nil
 }
 
@@ -28,6 +32,7 @@ func listFiles(ctx context.Context, client *github.Client, pr *PR, nextPage int)
 		PerPage: 100,
 		Page:    nextPage,
 	}
+
 	files, res, err := client.PullRequests.ListFiles(ctx, pr.Owner, pr.Repo, pr.Number, listOps)
 	if err != nil {
 		return nil, 0, err
@@ -37,5 +42,6 @@ func listFiles(ctx context.Context, client *github.Client, pr *PR, nextPage int)
 	for _, v := range files {
 		f = append(f, *v.Filename)
 	}
+
 	return f, res.NextPage, nil
 }
