@@ -25,6 +25,7 @@ func NewOption(url string, num int, token string) Option {
 func Approve(o Option, c *config.ApproveConfig) error {
 	ctx := context.Background()
 	client := github.NewClient(ctx, o.Token)
+
 	pr, err := github.SplitPR(o.PRURL, o.PRNum, c.Repo)
 	if err != nil {
 		return err
@@ -34,25 +35,31 @@ func Approve(o Option, c *config.ApproveConfig) error {
 	if err != nil {
 		return err
 	}
+
 	ownerPatterns, err := getOwnerPatterns(owner, c)
 	if err != nil {
 		return err
 	}
+
 	prFiles, err := client.ListPRFiles(ctx, pr)
 	if err != nil {
 		return err
 	}
+
 	if err := matchFiles(ctx, prFiles, ownerPatterns); err != nil {
 		return err
 	}
 
 	info := github.NewInfo(owner, ownerURL, prFiles, ownerPatterns)
+
 	comment, err := info.GenerateReviewComment()
 	if err != nil {
 		return err
 	}
+
 	if err := client.CreatePRReview(ctx, comment, pr); err != nil {
 		return err
 	}
+
 	return nil
 }

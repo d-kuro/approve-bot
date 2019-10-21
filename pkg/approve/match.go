@@ -40,6 +40,7 @@ func matchFiles(ctx context.Context, prFiles []string, ownerPatterns []string) e
 
 	for _, prf := range prFiles {
 		wg.Add(1)
+
 		go func(prf string) {
 			defer wg.Done()
 			if !isDone(ctx) {
@@ -65,6 +66,7 @@ func matchFiles(ctx context.Context, prFiles []string, ownerPatterns []string) e
 	if err := <-errCh; err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -74,18 +76,22 @@ func getOwnerPatterns(owner string, config *config.ApproveConfig) ([]string, err
 			return o.Patterns, nil
 		}
 	}
+
 	return nil, UnmatchedOwnerErr{msg: fmt.Sprintf("unmatched owner: %s", owner)}
 }
 
 func compileOwnerPatterns(ownerFiles []string) (map[string]*regexp.Regexp, error) {
 	compiles := make(map[string]*regexp.Regexp, len(ownerFiles))
+
 	for _, f := range ownerFiles {
 		r, err := regexp.Compile(f)
 		if err != nil {
 			return nil, err
 		}
+
 		compiles[f] = r
 	}
+
 	return compiles, nil
 }
 
