@@ -20,25 +20,31 @@ type PR struct {
 func SplitPR(prURL string, prNum int, repo string) (*PR, error) {
 	if prURL != "" {
 		bs := []byte(prURL)
+
 		group := regURL.FindSubmatch(bs)
 		if len(group) != 4 {
 			return nil, errors.New("invalid PR URL: " + prURL)
 		}
+
 		num, err := strconv.Atoi(string(group[3]))
 		if err != nil {
 			return nil, err
 		}
+
 		return &PR{
 			Owner:  string(group[1]),
 			Repo:   string(group[2]),
 			Number: num,
 		}, nil
 	}
+
 	bs := []byte(repo)
+
 	group := regRepo.FindSubmatch(bs)
 	if len(group) != 3 {
 		return nil, errors.New("invalid PR format")
 	}
+
 	return &PR{
 		Owner:  string(group[1]),
 		Repo:   string(group[2]),

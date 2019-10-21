@@ -16,5 +16,6 @@ func NewClient(ctx context.Context, token string) *Client {
 		&oauth2.Token{AccessToken: token},
 	)
 	tc := oauth2.NewClient(ctx, ts)
+
 	return &Client{client: github.NewClient(tc)}
 }

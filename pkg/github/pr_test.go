@@ -31,10 +31,12 @@ func TestSplitPR(t *testing.T) {
 	for _, tt := range cases {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+
 			pr, err := github.SplitPR(tt.url, tt.num, tt.repo)
 			if err != nil {
 				t.Fatalf("error: %v", err)
 			}
+
 			if !reflect.DeepEqual(pr, tt.pr) {
 				t.Errorf("got: %#v, want: %#v", pr, tt.pr)
 			}

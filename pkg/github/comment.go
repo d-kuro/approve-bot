@@ -27,10 +27,12 @@ func (i Info) GenerateReviewComment() (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	buf := &bytes.Buffer{}
 	if err := tmpl.Execute(buf, i); err != nil {
 		return "", err
 	}
+
 	return strings.ReplaceAll(buf.String(), "#", "`"), nil
 }
 
